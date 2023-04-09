@@ -1,3 +1,9 @@
+/*Hecho por Marcos Abaroa para la materia de Inteligencia Artificial I
+Programa que resuelve el juego del 15 o taken implementando IDA*
+Notas generales:
+-Aveces la solucion posiblemente no sea encontrada debido a la profundidad y la dificultad del puzzle generado
+-Si se quiere ver paso por paso lo que se hizo, se puede cambiar al main que esta comentado en la parte de abajo del codigo*/
+
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -8,8 +14,8 @@
 
 using namespace std;
 
-const int N = 4; // tamaño del tablero
-const int MAX_DEPTH = 100; // profundidad máxima
+const int N = 4; // tamaÃ±o del tablero
+const int MAX_DEPTH = 100; // profundidad maxima
 const int INF = numeric_limits<int>::max(); // valor infinito
 
 // Estructura para representar el estado del juego
@@ -29,7 +35,6 @@ struct State {
         x = N-1;
         y = N-1;
     }
-
     // Verifica si dos estados son iguales
     bool operator==(const State& other) const {
         for (int i = 0; i < N; i++) {
@@ -41,8 +46,7 @@ struct State {
         }
         return true;
     }
-
-    // Función para imprimir el tablero
+    // Funcion para imprimir el tablero
     void print() const {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
@@ -54,7 +58,7 @@ struct State {
     }
 };
 
-// Función heurística para estimar la distancia de Manhattan
+// Funcion heuristica para estimar la distancia de Manhattan
 int heuristic(const State& state) {
     int distance = 0;
     for (int i = 0; i < N; i++) {
@@ -70,7 +74,7 @@ int heuristic(const State& state) {
     return distance;
 }
 
-// Función para generar los sucesores de un estado
+// Funcion para generar los sucesores de un estado
 vector<State> successors(const State& state) {
     vector<State> succ;
     int x = state.x;
@@ -102,16 +106,16 @@ vector<State> successors(const State& state) {
     return succ;
 }
 
-// Función de búsqueda en profundidad limitada con poda de subárboles
+// Funcion de busqueda en profundidad
 void search(State state, int g, int bound, int (*heuristic)(const State&), vector<State>& solution, bool& found_solution) {
     int f = g + heuristic(state);
     if (f > bound) {
-        return; // excede la cota superior
+        return;
     }
     if (heuristic(state) == 0) {
         found_solution = true;
-        solution.push_back(state); // agrega el estado solución al vector
-        return; // solución encontrada
+        solution.push_back(state);
+        return; // solucion encontrada
     }
     int min_t = INF;
     vector<State> succ = successors(state);
@@ -121,13 +125,13 @@ void search(State state, int g, int bound, int (*heuristic)(const State&), vecto
         }
         search(s, g+1, bound, heuristic, solution, found_solution);
         if (found_solution) {
-            solution.push_back(state); // agrega el estado actual al vector
+            solution.push_back(state);
             return;
         }
     }
 }
 
-// Función de búsqueda IDA*
+// Funcion de busqueda IDA*
 vector<State> ida_star_search(State state, int (*heuristic)(const State&)) {
     vector<State> solution;
     int bound = heuristic(state);
@@ -138,13 +142,14 @@ vector<State> ida_star_search(State state, int (*heuristic)(const State&)) {
             reverse(solution.begin(), solution.end());
             return solution;
         } else if (bound == INF) {
-            return solution; // no se encontró solución
+            return solution; // no se encontro solucion
         } else {
             bound++;
         }
     }
 }
 
+//Main para imprimir solo la solucion
 int main() {
     State initial;
     srand(time(nullptr));
@@ -157,18 +162,19 @@ int main() {
     initial.print();
     vector<State> solution = ida_star_search(initial, heuristic);
     if (solution.empty()) {
-        cout << "No se encontró solución" << endl;
+        cout << "No se encontro solucion" << endl;
     } else {
-        cout << "Solucion encontrada con costo " << solution.size()-1 << ":" << endl;
-        for (State s : solution) {
-            s.print();
-        }
+        cout << "Solucion encontrada con costo " << solution.size()-1 << endl;
+        cout << " " << endl;
+        State final_state = solution.back();
+        cout << "Tablero final:" << endl;
+        final_state.print();
     }
     return 0;
 }
 
 /*
-Codigo para solo imprimir la solucion final
+//Main para imprimir paso por paso
 int main() {
     State initial;
     srand(time(nullptr));
@@ -180,12 +186,13 @@ int main() {
     cout << "Tablero inicial:" << endl;
     initial.print();
     vector<State> solution = ida_star_search(initial, heuristic);
-    if (!solution.empty()) {
-        State final_state = solution.back();
-        cout << "Tablero final:" << endl;
-        final_state.print();
+    if (solution.empty()) {
+        cout << "No se encontrï¿½ soluciï¿½n" << endl;
     } else {
-        cout << "No se encontró solución." << endl;
+        cout << "Solucion encontrada con costo " << solution.size()-1 << ":" << endl;
+        for (State s : solution) {
+            s.print();
+        }
     }
     return 0;
 }
