@@ -59,7 +59,7 @@ struct State {
 };
 
 // Funcion heuristica para estimar la distancia de Manhattan
-int heuristic(const State& state) {
+int Manhattan(const State& state) {
     int distance = 0;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
@@ -107,12 +107,12 @@ vector<State> successors(const State& state) {
 }
 
 // Funcion de busqueda en profundidad
-void search(State state, int g, int bound, int (*heuristic)(const State&), vector<State>& solution, bool& found_solution) {
-    int f = g + heuristic(state);
+void search(State state, int g, int bound, int (*Manhattan)(const State&), vector<State>& solution, bool& found_solution) {
+    int f = g + Manhattan(state);
     if (f > bound) {
         return;
     }
-    if (heuristic(state) == 0) {
+    if (Manhattan(state) == 0) {
         found_solution = true;
         solution.push_back(state);
         return; // solucion encontrada
@@ -123,7 +123,7 @@ void search(State state, int g, int bound, int (*heuristic)(const State&), vecto
         if (s == state) {
             continue;
         }
-        search(s, g+1, bound, heuristic, solution, found_solution);
+        search(s, g+1, bound, Manhattan, solution, found_solution);
         if (found_solution) {
             solution.push_back(state);
             return;
@@ -132,12 +132,12 @@ void search(State state, int g, int bound, int (*heuristic)(const State&), vecto
 }
 
 // Funcion de busqueda IDA*
-vector<State> ida_star_search(State state, int (*heuristic)(const State&)) {
+vector<State> ida_star(State state, int (*Manhattan)(const State&)) {
     vector<State> solution;
-    int bound = heuristic(state);
+    int bound = Manhattan(state);
     while (true) {
         bool found_solution = false;
-        search(state, 0, bound, heuristic, solution, found_solution);
+        search(state, 0, bound, Manhattan, solution, found_solution);
         if (found_solution) {
             reverse(solution.begin(), solution.end());
             return solution;
@@ -160,7 +160,7 @@ int main() {
     }
     cout << "Tablero inicial:" << endl;
     initial.print();
-    vector<State> solution = ida_star_search(initial, heuristic);
+    vector<State> solution = ida_star(initial, Manhattan);
     if (solution.empty()) {
         cout << "No se encontro solucion" << endl;
     } else {
@@ -185,7 +185,7 @@ int main() {
     }
     cout << "Tablero inicial:" << endl;
     initial.print();
-    vector<State> solution = ida_star_search(initial, heuristic);
+    vector<State> solution = ida_star(initial, Manhattan);
     if (solution.empty()) {
         cout << "No se encontr� soluci�n" << endl;
     } else {
